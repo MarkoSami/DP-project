@@ -1,0 +1,76 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@model List<Category>
+
+<div class="container">
+    <div class="row py-4">
+        <div class="col-6">
+            <h2>Category List</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-outline-success" asp-controller="Category" asp-action="Create"> <i class="bi bi-plus-lg fs-6"></i> Add a new category </a>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    
+    <tr>
+        <th>ID</th>
+        <th>Category name</th>
+        <th></th>
+    </tr>
+   @foreach(var category in Model)
+    {
+        <tr>
+            <td>@category.Id</td>
+            <td>@category.Name</td>
+            <td >
+                <div>
+                    <a class="btn btn-primary p-2" asp-controller="Category" asp-action="Edit" asp-route-id="@category.Id" ><i class="bi bi-pencil-fill"></i> Edit</a>
+                    <a class="btn btn-danger p-2 delete-btn" data-bs-target="#exampleModal" data-id="@category.Id" ><i class="bi bi-bookmark-x"></i> Delete</a>
+
+                </div
+
+            </td>
+        </tr>
+    }
+
+</table>
+
+ <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Delete Category</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete the category? <br /> <b class="fw-1">This Action cannot be reverted</b></p>
+      </div>
+      <div class="modal-footer">
+            <form asp-controller="Category" asp-action="Delete" method="post" id="deleteForm">
+                
+                <button type="submit" data-bs-dismiss="modal" class="btn btn-danger">Delete</button>
+            </form>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            var categoryId = this.getAttribute('data-id'); // Get the category Id from the data attribute
+            var deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `Category/Delete/${categoryId}`; // Update form action dynamically
+                var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                modal.show(); // Show the modal
+        });
+    });
+
+</script>

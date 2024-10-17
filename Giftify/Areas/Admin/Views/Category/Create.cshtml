@@ -1,0 +1,32 @@
+﻿@model Giftify.Models.Category
+
+
+<div class="m-auto position-relative mt-5" style="max-width: 640px">
+    <h1 class="text-primary text-center mb-2">Create Category</h1>
+
+
+    <form method="post" asp-action="Create" class="p-4 border m-auto">
+
+        <div asp-validation-summary="All" class="text-danger">
+
+        </div>
+        <div class="form-group mb-3">
+            <label asp-for="Name" class="mb-2 control-label "></label>
+            <input asp-for="Name" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    </form>
+
+    <a asp-controller="Category" asp-action="Index" class="bg-primary rounded-circle position-absolute top-0 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; cursor: pointer">
+            <i class="bi bi-caret-left-fill text-white"></i>
+    </a>
+
+</div>
+
+
+@section Scripts {  
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
