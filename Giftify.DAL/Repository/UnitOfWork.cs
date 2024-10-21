@@ -15,11 +15,14 @@ namespace Giftify.DAL.Repository
 
         public ICategoryRepository Category { get; }
         public IProductRepository Product {  get; }
+        public ICompanyRepostiory Company{ get;}
         public UnitOfWork(AppDbContext context)
         {
             this.context = context;
             Category = new CategoryRepository(context);
             Product = new ProductRepository(context);
+            Company = new CompanyRepostiory(context);
+
         }
 
         public void Save()

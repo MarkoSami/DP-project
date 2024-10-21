@@ -10,6 +10,8 @@ namespace Giftify.DAL.Repository.Interfaces
     {
         ICategoryRepository Category { get; }
         IProductRepository Product { get; }
+        ICompanyRepostiory Company{ get; }
+
 
         void Save();
     }

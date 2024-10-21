@@ -30,21 +30,7 @@
                         <li class="nav-item">
                             <a class="nav-link " asp-area="Customer"  asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        @* <li>
-                            <div class="dropdown">
-                                <button class="btn btn-primary dropdown-toggle p-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Dropdown button
-                                </button>
-                                <ul class="dropdown-menu">
-                                 <li>
-                                        <a class="dropdown-item" asp-area="Admin" asp-controller="Category" asp-action="Index">Categories</a>
-                                    </li>
-                                    <li><a class="dropdown-item" href="#">Products</a></li>
-                                    <hr class="dropdown-divider">
-                                    <li><a class="dropdown-item" href="#">Placeholder</a></li>
-                                </ul>
-                            </div>
-                        </li> *@
+                      
 
                     </ul>
                     @if(User.IsInRole(Roles.ADMIN))
@@ -79,6 +65,9 @@
                        </a>
                 <a class="btn btn-warning text-light rounded" asp-area="Admin" asp-controller="Product" asp-action="Index">
                     <i class="bi bi-box-seam-fill"></i> Products
+                </a>
+                <a class="btn btn-warning text-light rounded" asp-area="Admin" asp-controller="Company" asp-action="Index">
+                    <i class="bi bi-building"></i> Companies 
                 </a>
               </div>
         </div>

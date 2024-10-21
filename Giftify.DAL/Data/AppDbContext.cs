@@ -27,7 +27,28 @@ namespace Giftify.DataAccess.Data
 
 
             base.OnModelCreating(modelBuilder);
-
+            modelBuilder.Entity<Company>().HasData(
+                new Company()
+                {
+                    Id = 1,
+                    Name = "Walmart",
+                    City = "Cairo",
+                    Country = "Egypt",
+                    Phone = "01264543232",
+                    PostalCode = "123123",
+                    StreetAddress = "21 Imaginary street"
+                },
+                   new Company()
+                   {
+                       Id = 2,
+                       Name = "Karfour",
+                       City = "Cairo",
+                       Country = "Egypt",
+                       Phone = "012645213232",
+                       PostalCode = "125123",
+                       StreetAddress = "26 Imaginary street"
+                   }
+                );
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "PUBG" },
                 new Category { Id = 2, Name = "Roblox" },
@@ -35,6 +56,7 @@ namespace Giftify.DataAccess.Data
                 new Category { Id = 4, Name = "TikTok" },
                 new Category { Id = 5, Name = "FIFA" }
                 );
+
             modelBuilder.Entity<Product>().HasData(
                 new Product
                 {
