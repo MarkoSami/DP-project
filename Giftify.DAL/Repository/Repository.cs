@@ -40,7 +40,7 @@ namespace Giftify.DAL.Repository
             return query.FirstOrDefault();
         }
 
-        public List<T> GetAll(string includeProps)
+        public List<T> GetAll(Expression<Func<T, bool>>? filter = null, string includeProps = "")
         {
             IQueryable<T> query = dbSet;
             if (!string.IsNullOrEmpty(includeProps))
@@ -50,7 +50,15 @@ namespace Giftify.DAL.Repository
                     query = query.Include(prop);
                 }
             }
+            if (filter != null) { 
+                query = query.Where(filter);
+            }
             return query.ToList();
+        }
+
+        public IQueryable<T> GetAsQueryable() {
+            IQueryable<T> query = dbSet;
+            return query;
         }
 
         public void Remove(T item)
@@ -61,6 +69,11 @@ namespace Giftify.DAL.Repository
         public void RemoveRange(IEnumerable<T> items)
         {
             dbSet.RemoveRange(items);
+        }
+
+        public void Update(T item)
+        {
+            dbSet.Update(item);
         }
     }
 }

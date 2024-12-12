@@ -9,8 +9,9 @@ namespace Giftify.DAL.Repository.Interfaces
     public interface IUnitOfWork
     {
         ICategoryRepository Category { get; }
-        IProductRepository Product { get; }
-        ICompanyRepostiory Company{ get; }
+        IBookRepository Book { get; }
+
+        IOrderRepository Order { get; }
 
 
         void Save();

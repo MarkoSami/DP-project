@@ -12,20 +12,28 @@ namespace Giftify.Areas.Admin.Controllers
     [Area("Admin")]
     [Authorize(Roles = Roles.ADMIN)]
 
-    public class ProductController : Controller
+    public class BookController : Controller
     {
         private readonly IUnitOfWork unitOfWork;
         private readonly IWebHostEnvironment webHoshtEnv;
 
-        public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHoshtEnv)
+        public BookController(IUnitOfWork unitOfWork, IWebHostEnvironment webHoshtEnv)
         {
             this.unitOfWork = unitOfWork;
             this.webHoshtEnv = webHoshtEnv;
         }
         public IActionResult Index()
         {
-            List<Product> products = unitOfWork.Product.GetAll("Category");
-            return View("Index", products);
+            var books = unitOfWork.Book.GetAll(null, "Category");
+            var categories = unitOfWork.Category
+                .GetAll(c => books.Any(b => b.CategoryId == c.Id));
+            var indexVM = new IndexViewModel
+            {
+                Books = books,
+                Categories = categories
+            };
+
+            return View("Index", indexVM);
         }
         public IActionResult Upsert(int? id)
         {
@@ -36,10 +44,10 @@ namespace Giftify.Areas.Admin.Controllers
                     Value = u.Id.ToString()
                 }
                 );
-            ProductVM model = new ProductVM
+            BookVM model = new BookVM
             {
                 CategoryList = categories,
-                Product = new Product()
+                Book = null
             };
             if(id== null || id == 0 )
             {
@@ -47,13 +55,13 @@ namespace Giftify.Areas.Admin.Controllers
             }
             else
             {
-                model.Product = unitOfWork.Product.Get((u) => u.Id == id);
+                model.Book = unitOfWork.Book.Get((u) => u.Id == id);
                 return View(model);
             }
 
         }
         [HttpPost]
-        public IActionResult Upsert(ProductVM model, IFormFile? file)
+        public IActionResult Upsert(BookVM model, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
@@ -61,11 +69,11 @@ namespace Giftify.Areas.Admin.Controllers
                 if(file != null)
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string path = Path.Combine(rootPath, @"images\Product");
+                    string path = Path.Combine(rootPath, @"images\Book");
 
-                    if(!string.IsNullOrEmpty(model.Product.ImageURL))
+                    if(!string.IsNullOrEmpty(model.Book.ImageUrl))
                     {
-                        var existingImagePath = Path.Combine(rootPath, model.Product.ImageURL.TrimStart('\\'));
+                        var existingImagePath = Path.Combine(rootPath, model.Book.ImageUrl.TrimStart('\\'));
                         if(System.IO.File.Exists(existingImagePath))
                         {
                             System.IO.File.Delete(existingImagePath); 
@@ -76,18 +84,18 @@ namespace Giftify.Areas.Admin.Controllers
                     {
                         file.CopyTo(filestream);
                     }
-                    model.Product.ImageURL = @"\images\Product\" + fileName;
+                    model.Book.ImageUrl = @"\images\Book\" + fileName;
                 }
-                if(model.Product.Id != 0) {
+                if(model.Book.Id != 0) {
 
-                unitOfWork.Product.Update(model.Product);
+                unitOfWork.Book.Update(model.Book);
                 }
                 else
                 {
-                    unitOfWork.Product.Add(model.Product);
+                    unitOfWork.Book.Add(model.Book);
                 }
                 unitOfWork.Save();
-                TempData["success"] = "Product Created successfully";
+                TempData["success"] = "Book Created successfully";
                 return RedirectToAction("Index");
             }
             else
@@ -105,10 +113,10 @@ namespace Giftify.Areas.Admin.Controllers
        
         public IActionResult Delete(int id)
         {
-            Product productToDelete = unitOfWork.Product.Get(u => u.Id == id);
-            if (productToDelete == null) return NotFound();
+            Book BookToDelete = unitOfWork.Book.Get(u => u.Id == id);
+            if (BookToDelete == null) return NotFound();
 
-            unitOfWork.Product.Remove(productToDelete);
+            unitOfWork.Book.Remove(BookToDelete);
             unitOfWork.Save();
             return RedirectToAction("Index");
 
@@ -120,8 +128,8 @@ namespace Giftify.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<Product> products = unitOfWork.Product.GetAll("Category");
-            return Json(new {data = products });
+            List<Book> Books = unitOfWork.Book.GetAll(null, "Category");
+            return Json(new {data = Books });
         }
         #endregion
     }

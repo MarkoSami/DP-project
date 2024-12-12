@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Giftify.DAL.Repository.Interfaces
 {
-    public interface ICompanyRepostiory : IRepository<Company>
+    public interface IReviewRepository : IRepository<Review>
     {
-        void Update(Company item);
     }
 }

@@ -1,55 +1,55 @@
-﻿@model ProductVM
+﻿@model BookVM
 
 
 <div class="m-auto position-relative mt-5" style="max-width: 640px">
-    <h1 class="text-primary text-center mb-2">@(Model.Product.Id != 0 ? "Edit" : "Create") Product</h1>
+    <h1 class="text-primary text-center mb-2">@(Model.Book.Id != 0 ? "Edit" : "Create") Book</h1>
 
     <form method="post" asp-action="Upsert" class="p-4 border m-auto" enctype="multipart/form-data">
-        @if(Model.Product.ImageURL != null && Model.Product.ImageURL != string.Empty)
+        @if(Model.Book.ImageUrl != null && Model.Book.ImageUrl != string.Empty)
         {
-        <img src="@Model.Product.ImageURL" style="height: 20rem; object-fit: contain; background-position: center; width: 100%" />
+        <img src="@Model.Book.ImageUrl" style="height: 20rem; object-fit: contain; background-position: center; width: 100%" />
         }
 
-        <input type="hidden" asp-for="Product.Id" />
-        <input type="hidden" asp-for="Product.ImageURL" />
+        <input type="hidden" asp-for="Book.Id" />
+        <input type="hidden" asp-for="Book.ImageUrl" />
 
         <div class="form-group mb-3">
-            <label asp-for="Product.Title" class="mb-2 control-label "></label>
-            <input asp-for="Product.Title" class="form-control" />
+            <label asp-for="Book.Title" class="mb-2 control-label "></label>
+            <input asp-for="Book.Title" class="form-control" />
         </div>
         <div class="form-group mb-3">
-            <label asp-for="Product.Description" class="mb-2 control-label "></label>
-            <textarea asp-for="Product.Description" class="form-control" rows="8"></textarea>
+            <label asp-for="Book.Description" class="mb-2 control-label "></label>
+            <textarea asp-for="Book.Description" class="form-control" rows="8"></textarea>
         </div>
         <div class="form-group mb-3">
-            <label asp-for="Product.Price" class="mb-2 control-label "></label>
-            <input asp-for="Product.Price" class="form-control" />
+            <label asp-for="Book.Price" class="mb-2 control-label "></label>
+            <input asp-for="Book.Price" class="form-control" />
         </div>
         <div class="form-group mb-3">
-            <label asp-for="Product.Price10" class="mb-2 control-label "></label>
-            <input asp-for="Product.Price10" class="form-control" />
+            <label asp-for="Book.Price" class="mb-2 control-label "></label>
+            <input asp-for="Book.Price" class="form-control" />
         </div>
         <div class="form-group mb-3">
-            <label asp-for="Product.Price20" class="mb-2 control-label "></label>
-            <input asp-for="Product.Price20" class="form-control" />
+            <label asp-for="Book.Price" class="mb-2 control-label "></label>
+            <input asp-for="Book.Price" class="form-control" />
         </div>
         <div class="form-group mb-3">
-            <label asp-for="Product.ImageURL" class="mb-2 control-label "></label>
+            <label asp-for="Book.ImageUrl" class="mb-2 control-label "></label>
             <input  type="file" name="file" class="form-control" />
         </div>
-        <label asp-for="Product.CategoryId" class="mb-2 control-label "></label>
-        <select class="form-control" asp-for="Product.CategoryId" asp-items="@Model.CategoryList">
+        <label asp-for="Book.CategoryId" class="mb-2 control-label "></label>
+        <select class="form-control" asp-for="Book.CategoryId" asp-items="@Model.CategoryList">
             <option disabled selected>Select A Category</option>
         </select>
         <div asp-validation-summary="All" class="text-danger">
         </div>
         <div class="form-group">
-            <input type="submit" value="@(Model.Product?.Id != 0 ? "Update" : "Create")" class="btn btn-primary" />
+            <input type="submit" value="@(Model.Book?.Id != 0 ? "Update" : "Create")" class="btn btn-primary" />
         </div>
 
     </form>
 
-    <a asp-controller="Product" asp-action="Index" class="bg-primary rounded-circle position-absolute top-0 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; cursor: pointer">
+    <a asp-controller="Book" asp-action="Index" class="bg-primary rounded-circle position-absolute top-0 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; cursor: pointer">
         <i class="bi bi-caret-left-fill text-white"></i>
     </a>
 

@@ -9,91 +9,72 @@ namespace Giftify.DataAccess.Data
     {
 
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Product> Products { get; set; }
-        public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<Company> Companies{ get; set; }
-        public AppDbContext() : base()
+        public DbSet<Book> Books { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+
+ 
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-            
+
         }
 
 
-        public AppDbContext(DbContextOptions<AppDbContext> options): base(options)
-        {
-            
-        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Company>().HasData(
-                new Company()
-                {
-                    Id = 1,
-                    Name = "Walmart",
-                    City = "Cairo",
-                    Country = "Egypt",
-                    Phone = "01264543232",
-                    PostalCode = "123123",
-                    StreetAddress = "21 Imaginary street"
-                },
-                   new Company()
-                   {
-                       Id = 2,
-                       Name = "Karfour",
-                       City = "Cairo",
-                       Country = "Egypt",
-                       Phone = "012645213232",
-                       PostalCode = "125123",
-                       StreetAddress = "26 Imaginary street"
-                   }
-                );
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "PUBG" },
-                new Category { Id = 2, Name = "Roblox" },
-                new Category { Id = 3, Name = "Binance" },
-                new Category { Id = 4, Name = "TikTok" },
-                new Category { Id = 5, Name = "FIFA" }
-                );
 
-            modelBuilder.Entity<Product>().HasData(
-                new Product
+
+            // Configuring auto-increment for Id (optional, Entity Framework does it automatically)
+            modelBuilder.Entity<Category>()
+                .HasKey(c => c.Id); // Ensure Id is set as primary key
+            modelBuilder.Entity<Category>()
+                .Property(c => c.Id)
+                .ValueGeneratedOnAdd();
+
+            #region Seeding
+
+            // Seed Categories
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Fiction", Description = "Books that contain content derived from the imagination." },
+                new Category { Id = 2, Name = "Non-Fiction", Description = "Books that are based on real facts and information." },
+                new Category { Id = 3, Name = "Science", Description = "Books covering topics in science and technology." },
+                new Category { Id = 4, Name = "History", Description = "Books that explore historical events and figures." },
+                new Category { Id = 5, Name = "Mystery", Description = "Books that explore mystery events and figures." }
+            );
+
+            // Seed Books
+            modelBuilder.Entity<Book>().HasData(
+                new Book
                 {
                     Id = 1,
-                    Title = "TikTok 10$",
-                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\r\n\r\n",
-                    Price = 400,
-                    Price10 = 380,
-                    Price20 = 370,
-                    CategoryId = 4,
-                    ImageURL = ""
+                    Title = "The Great Gatsby",
+                    Author = "F. Scott Fitzgerald",
+                    Price = 9.99,
+                    Stock = 10,
+                    Description = "The story primarily concerns the young and mysterious millionaire Jay Gatsby and his quixotic passion and obsession with the beautiful former debutante Daisy Buchanan.",
+                    ImageUrl = "https://images-na.ssl-images-amazon.com/images/I",
+                    CategoryId = 1 // Matches 'Fiction'
                 },
-                new Product
+                new Book
                 {
                     Id = 2,
-                    Title = "TikTok 20$",
-                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\r\n\r\n",
-                    Price = 800,
-                    Price10 = 780,
-                    Price20 = 770,
-                    CategoryId = 4,
-                    ImageURL=""
-                },
-                new Product
-                {
-                    Id = 3,
-                    Title = "PUBG 10$",
-                    Description = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\"\r\n\r\n",
-                    Price = 350,
-                    Price10 = 340,
-                    Price20 = 330,
-                    CategoryId = 1,
-                    ImageURL=""
+                    Title = "To Kill a Mockingbird",
+                    Author = "Harper Lee",
+                    Price = 7.99,
+                    Stock = 10,
+                    Description = "A novel about the serious issues of rape and racial inequality, observed through the eyes of a young girl.",
+                    ImageUrl = "https://images-na.ssl-images-amazon.com/images/I",
+                    CategoryId = 5 // Matches 'Mystery'
                 }
-                );
-                base.OnModelCreating(modelBuilder);
-            }
+            );
+
+
+            #endregion
         }
     }
+}
 

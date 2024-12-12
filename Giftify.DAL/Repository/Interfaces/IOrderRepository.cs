@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace Giftify.DAL.Repository.Interfaces
 {
-    public interface IProductRepository : IRepository<Product>
+    public interface IOrderRepository : IRepository<Order>
     {
-        void Update(Product item);
     }
 }

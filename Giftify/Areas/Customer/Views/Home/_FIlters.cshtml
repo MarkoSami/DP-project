@@ -1,0 +1,33 @@
+﻿@model List<Category>
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<div>
+    <h2>Category Filter</h2>
+    <form method="get" id="filterForm">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var category in Model)
+            {
+                <div>
+                    <input type="checkbox" name="selectedCategories" value="@category.Id" id="category_@category.Id" />
+                    <label for="category_@category.Id">@category.Name</label>
+                </div>
+            }
+        }
+        <button type="submit">Apply Filters</button>
+    </form>
+</div>
+
+<div>
+    <h2>Sort By</h2>
+    <form method="get" id="sortingForm">
+        <select name="sortOption" onchange="document.getElementById('sortingForm').submit();">
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="rating_asc">Rating: Low to High</option>
+            <option value="rating_desc">Rating: High to Low</option>
+        </select>
+    </form>
+</div>

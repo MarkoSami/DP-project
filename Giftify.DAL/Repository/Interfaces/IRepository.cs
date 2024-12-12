@@ -11,7 +11,7 @@ namespace Giftify.DAL.Repository.Interfaces
     {
         T Get(Expression<Func<T, bool>> filter, string includeProps="");
 
-        List<T> GetAll(string includeProps = "");
+        List<T> GetAll(Expression<Func<T, bool>>? filter = null, string includeProps = "");
 
         void Add(T item);
 
@@ -19,6 +19,8 @@ namespace Giftify.DAL.Repository.Interfaces
 
         void RemoveRange(IEnumerable<T> items);
 
+        public IQueryable<T> GetAsQueryable();
+        void Update(T item);
 
 
     }

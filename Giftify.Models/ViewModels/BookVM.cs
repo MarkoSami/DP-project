@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Giftify.Models.ViewModels
 {
-    public class ProductVM
+    public class BookVM
     {
-        public Product Product { get; set; }
+        public Book Book{ get; set; }
         [ValidateNever]
         public IEnumerable<SelectListItem> CategoryList { get; set; }
     }

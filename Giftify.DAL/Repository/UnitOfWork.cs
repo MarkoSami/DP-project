@@ -14,14 +14,17 @@ namespace Giftify.DAL.Repository
         private readonly AppDbContext context;
 
         public ICategoryRepository Category { get; }
-        public IProductRepository Product {  get; }
-        public ICompanyRepostiory Company{ get;}
+        public IBookRepository Book{ get; }
+        public IOrderRepository Order{ get; }
+
+
+
+        
         public UnitOfWork(AppDbContext context)
         {
             this.context = context;
             Category = new CategoryRepository(context);
-            Product = new ProductRepository(context);
-            Company = new CompanyRepostiory(context);
+            Book = new BookRepository(context);
 
         }
 
