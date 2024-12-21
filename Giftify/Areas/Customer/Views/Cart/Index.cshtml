@@ -1,0 +1,48 @@
+﻿@page
+@model Cart
+@{
+}
+
+<h1>Cart</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Book Name</th>
+            <th>Quantity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.CartItems == null || !Model.CartItems.Any())
+        {
+            <tr>
+                <td colspan="4" class="text-center">Your cart is empty.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var item in Model.CartItems)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.Book.ImageUrl" alt="@item.Book.Title" style="width:100px;height:auto;" />
+                    </td>
+                    <td>@item.Book.Title</td>
+                    <td>
+                        <input type="number" value="@item.Quantity" min="1" class="form-control" style="width: 70px;" />
+                    </td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" asp-page-handler="Delete" asp-route-id="@item.Id">Delete</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div class="d-flex justify-content-end">
+    <button class="btn btn-primary" asp-page-handler="Purchase">Continue to Purchase</button>
+</div>
+ 

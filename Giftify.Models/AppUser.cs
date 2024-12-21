@@ -18,6 +18,8 @@ namespace Giftify.Models
         public string? City{ get; set; }
         public string? Governorate { get; set; }
         public string? PostalCode { get; set; }
+        public int CartId { get; set; }
+        public Cart Cart { get; set; }
 
     }
 }

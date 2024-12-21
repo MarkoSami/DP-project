@@ -1,71 +1,67 @@
 ﻿@model BookVM
 
-
 <div class="m-auto position-relative mt-5" style="max-width: 640px">
-    <h1 class="text-primary text-center mb-2">@(Model.Book.Id != 0 ? "Edit" : "Create") Book</h1>
+    <h1 class="text-primary text-center mb-2">@(Model.Book != null && Model.Book.Id != 0 ? "Edit" : "Create") Book</h1>
 
     <form method="post" asp-action="Upsert" class="p-4 border m-auto" enctype="multipart/form-data">
-        @if(Model.Book.ImageUrl != null && Model.Book.ImageUrl != string.Empty)
+        @if (Model.Book?.ImageUrl != null && Model.Book?.ImageUrl != string.Empty)
         {
-        <img src="@Model.Book.ImageUrl" style="height: 20rem; object-fit: contain; background-position: center; width: 100%" />
+            <img src="@Model.Book.ImageUrl" style="height: 20rem; object-fit: contain; background-position: center; width: 100%" />
         }
 
         <input type="hidden" asp-for="Book.Id" />
         <input type="hidden" asp-for="Book.ImageUrl" />
 
         <div class="form-group mb-3">
-            <label asp-for="Book.Title" class="mb-2 control-label "></label>
+            <label asp-for="Book.Title" class="mb-2 control-label"></label>
             <input asp-for="Book.Title" class="form-control" />
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Book.Description" class="mb-2 control-label "></label>
+            <label asp-for="Book.Description" class="mb-2 control-label"></label>
             <textarea asp-for="Book.Description" class="form-control" rows="8"></textarea>
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Book.Price" class="mb-2 control-label "></label>
+            <label asp-for="Book.Price" class="mb-2 control-label"></label>
             <input asp-for="Book.Price" class="form-control" />
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Book.Price" class="mb-2 control-label "></label>
-            <input asp-for="Book.Price" class="form-control" />
+            <label asp-for="Book.Author" class="mb-2 control-label"></label>
+            <input asp-for="Book.Author" class="form-control" />
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Book.Price" class="mb-2 control-label "></label>
-            <input asp-for="Book.Price" class="form-control" />
+            <label asp-for="Book.ImageUrl" class="mb-2 control-label"></label>
+            <input type="file" name="file" class="form-control" />
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Book.ImageUrl" class="mb-2 control-label "></label>
-            <input  type="file" name="file" class="form-control" />
+            <label asp-for="Book.CategoryId" class="mb-2 control-label"></label>
+            <select class="form-control" asp-for="Book.CategoryId" asp-items="@Model.CategoryList" required>
+                <option value="" disabled selected>Select A Category</option>
+            </select>
         </div>
-        <label asp-for="Book.CategoryId" class="mb-2 control-label "></label>
-        <select class="form-control" asp-for="Book.CategoryId" asp-items="@Model.CategoryList">
-            <option disabled selected>Select A Category</option>
-        </select>
-        <div asp-validation-summary="All" class="text-danger">
-        </div>
+
+        <div asp-validation-summary="All" class="text-danger"></div>
+
         <div class="form-group">
             <input type="submit" value="@(Model.Book?.Id != 0 ? "Update" : "Create")" class="btn btn-primary" />
         </div>
-
     </form>
 
     <a asp-controller="Book" asp-action="Index" class="bg-primary rounded-circle position-absolute top-0 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; cursor: pointer">
         <i class="bi bi-caret-left-fill text-white"></i>
     </a>
-
 </div>
-
-
 
 @section Scripts {
     <script>
         tinymce.init({
             selector: 'textarea',
             plugins: [
-                // Core editing features
-                'anchor', 'autolink', 'charmap', 'emoticons', 'lists', 'table', 'visualblocks', 'wordcount',
-                // Your account includes a free trial of TinyMCE premium features
-                // Try the most popular premium features until Oct 23, 2024:
+                'anchor', 'autolink', 'charmap', 'emoticons', 'lists', 'table', 'visualblocks', 'wordcount'
             ],
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
             tinycomments_mode: 'embedded',
@@ -73,8 +69,7 @@
             mergetags_list: [
                 { value: 'First.Name', title: 'First Name' },
                 { value: 'Email', title: 'Email' },
-            ],
-            ai_request: (request, respondWith) => respondWith.string(() => Promise.reject('See docs to implement AI Assistant')),
+            ]
         });
     </script>
 
@@ -82,4 +77,3 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
-

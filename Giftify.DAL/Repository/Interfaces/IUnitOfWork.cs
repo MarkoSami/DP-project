@@ -13,6 +13,7 @@ namespace Giftify.DAL.Repository.Interfaces
 
         IOrderRepository Order { get; }
 
+        ICartRepository Cart { get; }
 
         void Save();
     }

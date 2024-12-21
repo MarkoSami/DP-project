@@ -43,18 +43,26 @@ namespace Giftify.DAL.Repository
         public List<T> GetAll(Expression<Func<T, bool>>? filter = null, string includeProps = "")
         {
             IQueryable<T> query = dbSet;
+
+            // If includeProps is provided, include the related entities (e.g., eager loading)
             if (!string.IsNullOrEmpty(includeProps))
             {
-                foreach(var prop in  includeProps.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                foreach (var prop in includeProps.Split(',', StringSplitOptions.RemoveEmptyEntries))
                 {
-                    query = query.Include(prop);
+                    query = query.Include(prop); // Includes specified related properties
                 }
             }
-            if (filter != null) { 
-                query = query.Where(filter);
+
+            // If a filter is provided, apply it to the query
+            if (filter != null)
+            {
+                query = query.Where(filter); // Apply the filter to the query
             }
+
+            // Execute the query and return the results as a list
             return query.ToList();
         }
+
 
         public IQueryable<T> GetAsQueryable() {
             IQueryable<T> query = dbSet;

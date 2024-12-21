@@ -8,10 +8,10 @@
 <div class="container">
     <div class="row py-4">
         <div class="col-6">
-            <h2>Products List</h2>
+            <h2>Books List</h2>
         </div>
         <div class="col-6 text-end">
-            <a class="btn btn-outline-success" asp-controller="Product" asp-action="Upsert"> <i class="bi bi-plus-lg fs-6"></i> Add a new Product </a>
+            <a class="btn btn-outline-success" asp-controller="Book" asp-action="Upsert"> <i class="bi bi-plus-lg fs-6"></i> Add a new Product </a>
         </div>
     </div>
 </div>
@@ -20,11 +20,11 @@
     <thead>
         <tr>
             <th style="min-width: 20px">ID</th>
-            <th>Product Title</th>
+            <th>Book Title</th>
             <th>Price</th>
-            <th>Price - 10</th>
-            <th>Price - 20</th>
             <th>Category</th>
+            <th>Rating</th>
+            <th>Author</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -33,7 +33,7 @@
     </tbody>
 </table>
 
- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -54,60 +54,58 @@
   </div>
 </div>
 
-@section Scripts{
+@section Scripts {
     <script src="~/js/product.js"></script>
     <script>
-        // Use event delegation to handle dynamically created buttons
         document.addEventListener('DOMContentLoaded', function () {
+            var dataTable = $('#dataTable').DataTable(); // Store the instance globally
+
+            // Properly destroy the instance before reinitializing
+            if ($.fn.DataTable.isDataTable('#dataTable')) {
+                dataTable.destroy();
+            }
+
+            // Reinitialize DataTable with your custom AJAX settings
+            dataTable = $('#dataTable').DataTable({
+                "ajax": {
+                    "url": "/Admin/Book/BookDetails", // Replace with the actual data source URL
+                    "type": "GET",
+                    "dataSrc": "" // Adjust based on API response structure
+                },
+                "columns": [
+                    { "data": "id" },
+                    { "data": "productTitle" },
+                    { "data": "price" },
+                    { "data": "category" },
+                    { "data": "rating" },
+                    { "data": "author" },
+                    {
+                        "data": "id",
+                        "render": function (data) {
+                            return `
+                                        <button class='btn btn-danger delete-btn' data-id='${data}'>Delete</button>
+                                        <a class='btn btn-primary' href='/Admin/Book/Upsert/${data}'>Edit</a>
+                                    `;
+                        }
+                    }
+                ]
+            });
+
+            // Handle delete button click
             document.addEventListener('click', function (event) {
                 if (event.target && event.target.closest('.delete-btn')) {
-                    console.log("Entered");
-
                     var button = event.target.closest('.delete-btn');
-                    var productId = button.getAttribute('data-id'); // Get the Product Id from the data attribute
-                    console.log(productId);
+                    var productId = button.getAttribute('data-id');
 
                     var deleteForm = document.getElementById('deleteForm');
-                    deleteForm.action = `Product/Delete/${productId}`; // Update form action dynamically
+                    deleteForm.action = `/Admin/Book/Delete/${productId}`;
+
                     var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
-                    modal.show(); // Show the modal
+                    modal.show();
                 }
             });
         });
     </script>
-
 }
 
-
-@* 
-document.querySelectorAll('.expand').forEach(element => {
-    element.addEventListener('click', function () {
-        var desc = this.previousElementSibling;
-
-        // Get the current computed maxHeight
-        var currentMaxHeight = window.getComputedStyle(desc).maxHeight;
-
-        // Toggle between collapsed (100px) and expanded (no restriction)
-        if (currentMaxHeight === '100px') {
-            desc.style.maxHeight = 'none';  // Fully expand the element
-            this.innerText = 'Collapse';
-        } else {
-            desc.style.maxHeight = '100px'; // Collapse to 100px
-            this.innerText = 'Expand';
-        }
-    });
-});
-
-
-    document.querySelectorAll('.expand').forEach(element => {
-        var desc = element.previousElementSibling;
-
-
-        if (desc.offsetHeight < 100) {
-            element.style.display = 'none';  // Hides the 'expand' element if desc's height is less than 100px
-        }
-    });
-
-
-     *@
 

@@ -9,6 +9,7 @@ namespace Giftify.Models
 {
     public class Book : BaseEntity
     {
+        public new int? Id { get; set; }
         public required string Title { get; set; }
         public required string Author { get; set; }
         public required double Price { get; set; }
@@ -22,7 +23,7 @@ namespace Giftify.Models
         public double Rating { get; set; } = 0;
 
         public required int CategoryId { get; set; }
-        public Category Category { get; set; }
+        public Category? Category { get; set; }
 
 
     }

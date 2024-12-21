@@ -35,6 +35,17 @@ namespace Giftify.DataAccess.Data
                 .Property(c => c.Id)
                 .ValueGeneratedOnAdd();
 
+
+            // Configure one-to-one relationship between Cart and ApplicationUser
+            modelBuilder.Entity<Cart>()
+                .HasOne(c => c.User)  // Cart has one User
+                .WithOne(u => u.Cart) // ApplicationUser has one Cart
+                .HasForeignKey<Cart>(c => c.UserId) // Define the foreign key in Cart
+                .IsRequired(); // Cart must have a User (optional if not needed)
+
+
+
+
             #region Seeding
 
             // Seed Categories

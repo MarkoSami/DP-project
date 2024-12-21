@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using Giftify.DataAccess.Data; // Required for EF Core methods
 
 namespace Giftify.Areas.Identity.Pages.Account
 {
@@ -35,6 +37,7 @@ namespace Giftify.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly AppDbContext _context; // Add a reference to your DbContext
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -42,7 +45,8 @@ namespace Giftify.Areas.Identity.Pages.Account
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            AppDbContext context) // Inject ApplicationDbContext
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -51,98 +55,24 @@ namespace Giftify.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _roleManager = roleManager;
+            _context = context; // Initialize the context
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public RegisterVM Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        //public class InputModel
-        //{
-        //    /// <summary>
-        //    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        //    ///     directly from your code. This API may change or be removed in future releases.
-        //    /// </summary>
-        //    [Required]
-        //    [EmailAddress]
-        //    [Display(Name = "Email")]
-        //    public string Email { get; set; }
-
-        //    /// <summary>
-        //    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        //    ///     directly from your code. This API may change or be removed in future releases.
-        //    /// </summary>
-        //    [Required]
-        //    [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-        //    [DataType(DataType.Password)]
-        //    [Display(Name = "Password")]
-        //    public string Password { get; set; }
-
-        //    /// <summary>
-        //    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        //    ///     directly from your code. This API may change or be removed in future releases.
-        //    /// </summary>
-        //    [DataType(DataType.Password)]
-        //    [Display(Name = "Confirm password")]
-        //    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        //    public string ConfirmPassword { get; set; }
-
-        //    public string Role { get; set; }
-
-        //    [ValidateNever]
-        //    public IEnumerable<SelectListItem> AvailableRoles { get; set; }
-
-        //    [Required]
-        //    public string FirstName { get; set; }
-        //    [Required]
-        //    public string LastName { get; set; }
-        //    [Required]
-
-        //    public string? StreetAddress { get; set; }
-        //    [Required]
-
-        //    public string? City { get; set; }
-        //    [Required]
-
-        //    public string? Governorate { get; set; }
-        //    [Required]
-
-        //    public string? PostalCode { get; set; }
-
-        //    [Required]
-        //    public string PhoneNumber{ get; set; }
-
-        //}
-
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-
             if (!(await _roleManager.RoleExistsAsync(Roles.ADMIN)))
             {
                 await _roleManager.CreateAsync(new IdentityRole(Roles.ADMIN));
                 await _roleManager.CreateAsync(new IdentityRole(Roles.CUSTOMER));
                 await _roleManager.CreateAsync(new IdentityRole(Roles.COMPANY));
             }
+
             Input = new()
             {
                 AvailableRoles = _roleManager.Roles.Select(x => x.Name).Select(u => new SelectListItem() { Text = u, Value = u })
@@ -154,9 +84,9 @@ namespace Giftify.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             // Repopulate available roles in case of errors
             Input.AvailableRoles = _roleManager.Roles.Select(x => x.Name)
                 .Select(u => new SelectListItem { Text = u, Value = u }).ToList();
@@ -164,18 +94,53 @@ namespace Giftify.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                // Create user
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+
+                    // Assign role if provided
                     if (!string.IsNullOrEmpty(Input.Role))
                     {
-                       await _userManager.AddToRoleAsync(user, Input.Role);
+                        var roleResult = await _userManager.AddToRoleAsync(user, Input.Role);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            return Page();
+                        }
                     }
+
+                    // Create cart for the new user
+                    try
+                    {
+                        var cart = new Cart
+                        {
+                            UserId = user.Id,        // Associate cart with user
+                            CreatedAt = DateTime.UtcNow // Set created date
+                        };
+
+                        // Add and save cart
+                        _context.Carts.Add(cart);
+                        await _context.SaveChangesAsync();
+
+                        _logger.LogInformation($"Cart created with ID {cart.Id} for user {user.Id}.");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"Error creating cart for user {user.Id}: {ex.Message}");
+                        ModelState.AddModelError(string.Empty, "An error occurred while creating your cart. Please try again.");
+                        return Page();
+                    }
+
+                    // Email confirmation
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -198,13 +163,15 @@ namespace Giftify.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
+
+                // Handle errors during user creation
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
 
-            // If we got this far, something failed, redisplay form
+            // If we got this far, something failed; redisplay form
             return Page();
         }
 

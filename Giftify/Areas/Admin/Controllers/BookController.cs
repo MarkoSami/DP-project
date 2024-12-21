@@ -25,58 +25,77 @@ namespace Giftify.Areas.Admin.Controllers
         public IActionResult Index()
         {
             var books = unitOfWork.Book.GetAll(null, "Category");
-            var categories = unitOfWork.Category
-                .GetAll(c => books.Any(b => b.CategoryId == c.Id));
-            var indexVM = new IndexViewModel
-            {
-                Books = books,
-                Categories = categories
-            };
 
-            return View("Index", indexVM);
+            
+
+            return View("Index", books);
         }
+
+
+        [HttpGet]
+        public IActionResult BookDetails()
+        {
+            var books = unitOfWork.Book.GetAll(null,"Category"); // Fetch data from your service/repository
+
+            var result = books.Select(book => new
+            {
+                id = book.Id,
+                productTitle = book.Title,
+                price = book.Price,
+                rating = book.Rating,
+                category = book.Category.Name,
+                author = book.Author
+            });
+
+            return Json(result);
+        }
+        [HttpGet]
         public IActionResult Upsert(int? id)
         {
-            IEnumerable<SelectListItem> categories = unitOfWork.Category.GetAll().Select(
-                u=> new SelectListItem
+            var categories = unitOfWork.Category.GetAll().Select(
+                u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 }
-                );
+            ).ToList();
+
             BookVM model = new BookVM
             {
                 CategoryList = categories,
-                Book = null
+                Book = null// Initialize an empty book if id is null
             };
-            if(id== null || id == 0 )
+
+            if (id != null && id > 0)
             {
-                return View(model);
-            }
-            else
-            {
-                model.Book = unitOfWork.Book.Get((u) => u.Id == id);
-                return View(model);
+                var existingBook = unitOfWork.Book.Get(u => u.Id == id);
+                if (existingBook != null)
+                {
+                    model.Book = existingBook;
+                }
             }
 
+            return View(model);
         }
+
         [HttpPost]
         public IActionResult Upsert(BookVM model, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
                 string rootPath = webHoshtEnv.WebRootPath;
-                if(file != null)
+
+                if (file != null)
                 {
                     string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
                     string path = Path.Combine(rootPath, @"images\Book");
 
-                    if(!string.IsNullOrEmpty(model.Book.ImageUrl))
+                    if (!string.IsNullOrEmpty(model.Book.ImageUrl))
                     {
                         var existingImagePath = Path.Combine(rootPath, model.Book.ImageUrl.TrimStart('\\'));
-                        if(System.IO.File.Exists(existingImagePath))
+                        if (System.IO.File.Exists(existingImagePath))
                         {
-                            System.IO.File.Delete(existingImagePath); 
+                            System.IO.File.Delete(existingImagePath);
                         }
                     }
 
@@ -84,33 +103,38 @@ namespace Giftify.Areas.Admin.Controllers
                     {
                         file.CopyTo(filestream);
                     }
+
                     model.Book.ImageUrl = @"\images\Book\" + fileName;
                 }
-                if(model.Book.Id != 0) {
 
-                unitOfWork.Book.Update(model.Book);
+                if (model.Book.Id != 0)
+                {
+                    unitOfWork.Book.Update(model.Book);
                 }
                 else
                 {
                     unitOfWork.Book.Add(model.Book);
                 }
+
                 unitOfWork.Save();
-                TempData["success"] = "Book Created successfully";
+                TempData["success"] = "Book saved successfully";
                 return RedirectToAction("Index");
             }
-            else
-            {
-                model.CategoryList = unitOfWork.Category.GetAll().Select(
+
+            // Re-populate the dropdown if the form submission fails validation
+            model.CategoryList = unitOfWork.Category.GetAll().Select(
                 u => new SelectListItem
                 {
                     Text = u.Name,
-                    Value = u.Id.ToString()
+                    Value = u.Id.ToString(),
+                    Selected = u.Id == model.Book.CategoryId
                 }
-                );
-            }
+            ).ToList();
+
             return View(model);
         }
-       
+
+
         public IActionResult Delete(int id)
         {
             Book BookToDelete = unitOfWork.Book.Get(u => u.Id == id);

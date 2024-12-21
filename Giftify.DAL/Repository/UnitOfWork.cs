@@ -17,15 +17,17 @@ namespace Giftify.DAL.Repository
         public IBookRepository Book{ get; }
         public IOrderRepository Order{ get; }
 
+        public ICartRepository Cart { get; }
 
 
-        
+
+
         public UnitOfWork(AppDbContext context)
         {
             this.context = context;
             Category = new CategoryRepository(context);
             Book = new BookRepository(context);
-
+            Cart = new CartRepository(context);
         }
 
         public void Save()
