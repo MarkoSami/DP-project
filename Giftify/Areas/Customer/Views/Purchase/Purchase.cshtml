@@ -1,0 +1,66 @@
+﻿@model PurchaseVM
+@{
+    ViewData["Title"] = "Purchase";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Purchase Summary</h2>
+                </div>
+                <div class="card-body">
+                    @if (Model.CartItems != null && Model.CartItems.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Book Title</th>
+                                        <th>Price</th>
+                                        <th>Quantity</th>
+                                        <th class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.CartItems)
+                                    {
+                                        <tr>
+                                            <td>@item.Book.Title</td>
+                                            <td>@item.Book.Price.ToString("C")</td>
+                                            <td>@item.Quantity</td>
+                                            <td class="text-end">@((item.Book.Price * item.Quantity).ToString("C"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Total:</td>
+                                        <td class="text-end fw-bold">@Model.Total.ToString("C")</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <form asp-area="Customer" asp-controller="Order" asp-action="PlaceOrder" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-cart-check"></i> Place Order
+                                </button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <h4>Your cart is empty</h4>
+                            <a href="/" class="btn btn-primary mt-3">Continue Shopping</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

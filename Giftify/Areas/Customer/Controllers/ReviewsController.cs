@@ -56,6 +56,7 @@ namespace Giftify.Areas.Customer.Controllers
 
                 // Add the Review entity to the database context
                 _context.Reviews.Add(review);
+                _context.Books.Find(review.BookId).Rating = _context.Reviews.Where(r => r.BookId == review.BookId).Average(r => r.Rating);
                 await _context.SaveChangesAsync();
 
                 // Redirect back to the book's details page

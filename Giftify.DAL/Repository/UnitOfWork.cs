@@ -28,6 +28,7 @@ namespace Giftify.DAL.Repository
             Category = new CategoryRepository(context);
             Book = new BookRepository(context);
             Cart = new CartRepository(context);
+            Order = new OrderRepository(context);
         }
 
         public void Save()
