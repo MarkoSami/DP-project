@@ -1,0 +1,92 @@
+﻿@model Giftify.Models.ViewModels.ReviewVM
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("Entered");
+
+        // Get the star container
+        const starContainer = document.getElementById('star-rating');
+        const hiddenInput = document.getElementById('Rating');
+        const starCount = 5;
+
+        // Dynamically create stars
+        for (let i = 1; i <= starCount; i++) {
+            const star = document.createElement('span');
+            star.classList.add('star');
+            star.dataset.value = i;
+            star.innerHTML = '&#9733;';
+            starContainer.appendChild(star);
+        }
+
+        // Highlight stars based on a value
+        function highlightStars(value) {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                if (parseInt(star.dataset.value) <= value) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        // Add event listeners for hover, leave, and click
+        starContainer.addEventListener('mouseover', function (event) {
+            if (event.target.classList.contains('star')) {
+                const value = event.target.dataset.value;
+                highlightStars(value);
+            }
+        });
+
+        starContainer.addEventListener('mouseout', function () {
+            const selectedValue = hiddenInput.value || 0;
+            highlightStars(selectedValue);
+        });
+
+        starContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('star')) {
+                const value = event.target.dataset.value;
+                hiddenInput.value = value; // Set the hidden input value
+                highlightStars(value);    // Highlight stars up to the selected one
+            }
+        });
+    });
+</script>
+<style>
+    .star-rating {
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    .star {
+        font-size: 2rem;
+        color: #ccc;
+    }
+
+        .star.selected {
+            color: #f39c12; /* Gold color for selected stars */
+        }
+
+        .star:hover {
+            color: #f1c40f; /* Bright gold on hover */
+        }
+</style>
+
+<form asp-action="Create" asp-controller="Reviews" method="post">
+    <input type="hidden" asp-for="BookId" />
+    <input type="hidden" asp-for="UserId" />
+    <input type="hidden" id="Rating" name="Rating" />
+
+    <div class="form-group">
+        <label for="Rating">Rating</label>
+        <div id="star-rating" class="star-rating">
+            <!-- Stars will be dynamically added by jQuery -->
+        </div>
+    </div>
+
+    <div class="form-group mb-2">
+        <label asp-for="Content">Review</label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary mb-2">Submit Review</button>
+</form>
+

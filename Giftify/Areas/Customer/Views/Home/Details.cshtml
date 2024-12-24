@@ -48,6 +48,14 @@
     <div id="description" class="mt-3">
     </div>
 </div>
+<div id="reviews-section">
+    @await Html.PartialAsync("_ReviewsList", Model.Reviews)
+</div>
+
+<div id="review-create-section">
+    @await Html.PartialAsync("_CreateReview", new Giftify.Models.ViewModels.ReviewVM{ BookId = Model.Id.Value, Content= "", Rating = 1, UserId = ViewBag.UserId })
+</div>
+
 
 @section Scripts {
     <script>

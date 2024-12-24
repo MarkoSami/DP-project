@@ -1,10 +1,14 @@
 using Giftify.DAL.Repository.Interfaces;
+using Giftify.DataAccess.Data;
 using Giftify.Models;
 using Giftify.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Diagnostics;
+using System.Net;
+using System.Security.Claims;
 
 namespace Giftify.Areas.Customer.Controllers
 {
@@ -13,11 +17,13 @@ namespace Giftify.Areas.Customer.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IUnitOfWork unitOfWork;
+        private readonly AppDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork)
+        public HomeController(ILogger<HomeController> logger, IUnitOfWork unitOfWork, AppDbContext context)
         {
             _logger = logger;
             this.unitOfWork = unitOfWork;
+            _context = context;
         }
 
         public IActionResult Index(List<int> selectedCategories, string sortOrder = "", string searchQuery = "")
@@ -67,10 +73,22 @@ namespace Giftify.Areas.Customer.Controllers
 
 
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var book = unitOfWork.Book.Get(u => u.Id == id);
+            var book = await _context.Books
+                .Include(b => b.Reviews)
+                .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(b => b.Id == id);
+            ViewBag.BookId = book.Id;
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // will give the user's userId
+            ViewBag.UserId = userId;
+            if (book == null)
+            {
+                return NotFound();
+            }
+
             return View(book);
+
 
         }
         public IActionResult Privacy()

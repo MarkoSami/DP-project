@@ -20,6 +20,7 @@ namespace Giftify.Models
         public string? PostalCode { get; set; }
         public int CartId { get; set; }
         public Cart Cart { get; set; }
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
     }
 }
