@@ -1,0 +1,95 @@
+﻿@using Giftify.Properties;
+@model List<Order>
+<div class="container">
+    <div class="row py-4">
+        <div class="col-6">
+            <h2>Order List</h2>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <tr>
+        <th>Order ID</th>
+        <th>User</th>
+        <th>Total Price</th>
+        <th>Status</th>
+        <th>Items Count</th>
+        <th>Actions</th>
+    </tr>
+    @foreach (var order in Model)
+    {
+        <tr>
+            <td>@order.Id</td>
+            <td>@order.User.UserName</td>
+            <td>$@order.TotalPrice.ToString("F2")</td>
+            <td>
+                <span class="badge @GetStatusBadgeClass(order.Status)">
+                    @order.Status
+                </span>
+            </td>
+            <td>@order.OrderItems.Count</td>
+            <td>
+                <div>
+                    <a class="btn btn-primary p-2" asp-controller="Order" asp-action="Details" asp-route-id="@order.Id">
+                        <i class="bi bi-info-circle"></i> Details
+                    </a>
+                    @if (order.Status == Giftify.Properties.OrderStatus.Pending)
+                    {
+                        <a class="btn btn-danger p-2 delete-btn" data-bs-target="#exampleModal" data-id="@order.Id">
+                            <i class="bi bi-x-circle"></i> Cancel Order
+                        </a>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Cancel Order</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Are you sure you want to cancel this order? <br />
+                    <b class="fw-1">This Action cannot be reverted</b>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <form asp-controller="Order" asp-action="Cancel" method="post" id="deleteForm">
+                    <button type="submit" data-bs-dismiss="modal" class="btn btn-danger">Cancel Order</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    private string GetStatusBadgeClass(OrderStatus status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => "bg-warning",
+            OrderStatus.Confirmed => "bg-success",
+            OrderStatus.Cancelled => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+<script>
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+            var orderId = this.getAttribute('data-id');
+            var deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `Order/Cancel/${orderId}`;
+            var modal = new bootstrap.Modal(document.getElementById('exampleModal'));
+            modal.show();
+        });
+    });
+</script>

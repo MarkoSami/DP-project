@@ -18,6 +18,9 @@ builder.Services.AddDbContext<AppDbContext>((options) =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.AddSingleton<NotificationService>();
+builder.Services.AddScoped<OrderNotificationObserver>();
+
 // Configure Identity with more options
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
@@ -80,6 +83,10 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddRazorPages();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
+builder.Services.AddScoped<INotificationStrategy, EmailNotificationStrategy>();
+
 
 var app = builder.Build();
 
